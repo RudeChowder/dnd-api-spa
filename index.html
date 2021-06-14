@@ -6,13 +6,19 @@
     <title>DnD Monster Finder</title>
 
     <link rel="stylesheet" href="style.css">
-    <script async src="index.js"></script>
   </head>
   <body>
     <div id="title-bar">
       <h1>DnD Monster List</h1>
     </div>
-
+    
+    <div class="favorites">
+      <h3>Favorites list</h3>
+      <ul id="favorites-list">
+        
+      </ul>
+    </div>
+    
     <div id="search-bar">
       <div class="search">
         <form id="search-form">
@@ -21,8 +27,9 @@
         </form>
       </div>
       <div class="search" id="filters">
-        <label for="alphabetical-filter">Filter by letter: </label>
+        <label for="alphabetical-filter">Filter by: </label>
         <select name="alphabetical-filter" id="alphabetical-filter">
+          <option value="all" selected>letter</option>
           <option value="a">A</option>
           <option value="b">B</option>
           <option value="c">C</option>
@@ -51,17 +58,21 @@
           <option value="z">Z</option>
         </select>
       </div>
+      <div>
+        <button type="button" id="show-favorites-button">Show favorites</button>
+      </div>
     </div>
-
+    
     <div id="monster-list">
-      <div id="monster-index" class="monster-card">
+      <!-- <div id="monster-index" class="monster-card">
         <h2>Monster Name</h2>
         <p id="index-size"><strong>Size: </strong>Medium</p>
         <p id="index-type"><strong>Type: </strong>Humanoid</p>
         <p id="index-subtype"><strong>Subtype: </strong>Goblinoid</p>
         <p id="index-challenge-rating"><strong>Challenge Rating: </strong>5</p>
-      </div>
+      </div> -->
     </div>
+    <script src="index.js"></script>
   </body>
-
-</html>
+  
+  </html>

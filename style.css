@@ -6,6 +6,16 @@ h1 {
   width: 50%;
 }
 
+.favorites {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+#favorites-list {
+  text-align: left;
+}
+
 .monster-card {
   background-color: #43B1AC;
   display: inline-block;

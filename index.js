@@ -33,12 +33,16 @@ class Monster {
   handleFavorite () {
     if (favoriteMonsters.includes(this)) {
       this.favoriteButton.innerHTML = `Favorite <span class="empty">${emptyStar}</span>`
-      const index = favoriteMonsters.indexOf(this)
-      favoriteMonsters.splice(index, 1)
+      const location = favoriteMonsters.indexOf(this)
+      favoriteMonsters.splice(location, 1)
       console.log(favoriteMonsters)
+      this.favoritesListItem.remove()
     } else {
       favoriteMonsters.push(this)
       this.favoriteButton.innerHTML = `Favorite <span class="full">${fullStar}</span>`
+      this.favoritesListItem = document.createElement("li")
+      this.favoritesListItem.innerText = this.name
+      document.querySelector("#favorites-list").append(this.favoritesListItem)
       console.log(favoriteMonsters)
     }
   }
@@ -91,13 +95,13 @@ class Monster {
 const favoriteMonsters = []
 document.addEventListener("DOMContentLoaded", () => {
   const clearCurrentCards = () => {
-    const currentCards = document.querySelectorAll(".monster-card")
-    currentCards.forEach(card => {
-      card.classList.add("hidden")
+    allMonsters.forEach(monster => {
+      monster.card.classList.add("hidden")
     })
   }
 
   const displayRequestedMonsters = (requestedMonsters) => {
+    clearCurrentCards()
     requestedMonsters.forEach(monster => {
       if (document.querySelector(`#${monster.index}`)) {
         document.querySelector(`#${monster.index}`).classList.remove("hidden")
@@ -107,29 +111,32 @@ document.addEventListener("DOMContentLoaded", () => {
     })
   }
 
-  // GET all the monsters from the api
   let allMonsters = []
+  // GET all the monsters from the api
   fetch("https://www.dnd5eapi.co/api/monsters")
     .then(resp => resp.json())
     .then(monsters => {
-      allMonsters = monsters.results
-      console.log(allMonsters)
-      const sample = [allMonsters[0], allMonsters[20], allMonsters[50], allMonsters[88], allMonsters[100], allMonsters[138], allMonsters[190]]
+      const testMonsters = monsters.results
+      console.log(testMonsters)
+      const sample = [testMonsters[0], testMonsters[20], testMonsters[50], testMonsters[88], testMonsters[100], testMonsters[138], testMonsters[190]]
       sample.forEach(monster => {
         const monsterObj = new Monster(monster.index, monster.url)
         monsterObj.generateAndAppendCard()
+        allMonsters.push(monsterObj)
       })
     })
 
   document.querySelector("#alphabetical-filter").addEventListener("change", (event) => {
-    clearCurrentCards()
-    const requestedMonsters = allMonsters.filter(monster => monster.index.charAt(0) === event.target.value)
-    displayRequestedMonsters(requestedMonsters)
+    if (event.target.value === "all") {
+      displayRequestedMonsters(allMonsters)
+    } else {
+      const requestedMonsters = allMonsters.filter(monster => monster.index.charAt(0) === event.target.value)
+      displayRequestedMonsters(requestedMonsters)
+    }
   })
 
   document.querySelector("#search-form").addEventListener("submit", event => {
     event.preventDefault()
-    clearCurrentCards()
     const searchInput = document.querySelector("#search-input")
     // force search term into monster index format for filtering
     const searchTerm = searchInput.value.toLowerCase().trim().replace(" ", "-")
@@ -140,5 +147,9 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("No results found")
     }
     searchInput.value = ""
+  })
+
+  document.querySelector("#show-favorites-button").addEventListener("click", () => {
+    displayRequestedMonsters(favoriteMonsters)
   })
 })
