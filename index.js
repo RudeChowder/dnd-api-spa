@@ -1,3 +1,6 @@
+const emptyStar = "☆"
+const fullStar = "★"
+
 class Monster {
   constructor (index, url) {
     this.index = index
@@ -18,6 +21,26 @@ class Monster {
     this.nameTag.classList.add("subtype")
     this.challengeRatingTag = document.createElement("p")
     this.nameTag.classList.add("challenge-rating")
+  }
+
+  createFavoriteButton () {
+    this.favoriteButton = document.createElement("button")
+    this.favoriteButton.type = "button"
+    this.favoriteButton.innerHTML = `Favorite <span class="empty">${emptyStar}</span>`
+    this.favoriteButton.addEventListener("click", () => this.handleFavorite())
+  }
+
+  handleFavorite () {
+    if (favoriteMonsters.includes(this)) {
+      this.favoriteButton.innerHTML = `Favorite <span class="empty">${emptyStar}</span>`
+      const index = favoriteMonsters.indexOf(this)
+      favoriteMonsters.splice(index, 1)
+      console.log(favoriteMonsters)
+    } else {
+      favoriteMonsters.push(this)
+      this.favoriteButton.innerHTML = `Favorite <span class="full">${fullStar}</span>`
+      console.log(favoriteMonsters)
+    }
   }
 
   fetchAttributesAndPopulateTags () {
@@ -49,6 +72,7 @@ class Monster {
     this.card.append(this.typeTag)
     this.card.append(this.subtypeTag)
     this.card.append(this.challengeRatingTag)
+    this.card.append(this.favoriteButton)
   }
 
   addCardToPage () {
@@ -58,11 +82,13 @@ class Monster {
   generateAndAppendCard () {
     this.createTags()
     this.fetchAttributesAndPopulateTags()
+    this.createFavoriteButton()
     this.buildCard()
     this.addCardToPage()
   }
 }
 
+const favoriteMonsters = []
 document.addEventListener("DOMContentLoaded", () => {
   const clearCurrentCards = () => {
     const currentCards = document.querySelectorAll(".monster-card")
@@ -94,11 +120,6 @@ document.addEventListener("DOMContentLoaded", () => {
         monsterObj.generateAndAppendCard()
       })
     })
-  // GET the info for each monster
-  // create a monster-card for each monster
-  // fill in info into the correct elements
-  // attach the elements to the card
-  // attach the card to the monster container
 
   document.querySelector("#alphabetical-filter").addEventListener("change", (event) => {
     clearCurrentCards()

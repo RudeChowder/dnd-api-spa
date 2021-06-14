@@ -20,6 +20,10 @@ h1 {
   border-bottom: solid 2px;
 }
 
+span.full{
+  color: #160F29;
+}
+
 .hidden {
   display: none;
 }
