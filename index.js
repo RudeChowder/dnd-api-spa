@@ -3,11 +3,11 @@ class Monster {
     this.index = index
     this.url = url
   }
-  
+
   // possible to DRY this up?
   createTags () {
-    this.div = document.createElement("div")
-    this.div.classList.add("monster-card")
+    this.card = document.createElement("div")
+    this.card.classList.add("monster-card")
     this.nameTag = document.createElement("h2")
     this.nameTag.classList.add("name")
     this.sizeTag = document.createElement("p")
@@ -34,7 +34,7 @@ class Monster {
   }
 
   populateTags () {
-    this.div.id = this.index
+    this.card.id = this.index
     this.nameTag.innerHTML = `${this.name}`
     // this.setTagText([this.sizeTag, this.typeTag, this.subtypeTag, this.challengeRatingTag])
     this.sizeTag.innerHTML = `<strong>Size: </strong>${this.size}`
@@ -44,15 +44,15 @@ class Monster {
   }
 
   buildCard () {
-    this.div.append(this.nameTag)
-    this.div.append(this.sizeTag)
-    this.div.append(this.typeTag)
-    this.div.append(this.subtypeTag)
-    this.div.append(this.challengeRatingTag)
+    this.card.append(this.nameTag)
+    this.card.append(this.sizeTag)
+    this.card.append(this.typeTag)
+    this.card.append(this.subtypeTag)
+    this.card.append(this.challengeRatingTag)
   }
 
   addCardToPage () {
-    document.querySelector("#monster-list").append(this.div)
+    document.querySelector("#monster-list").append(this.card)
   }
 
   generateAndAppendCard () {
@@ -64,18 +64,60 @@ class Monster {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  // GET all the monsters from the api
+  const clearCurrentCards = () => {
+    const currentCards = document.querySelectorAll(".monster-card")
+    currentCards.forEach(card => {
+      card.classList.add("hidden")
+    })
+  }
 
+  const displayRequestedMonsters = (requestedMonsters) => {
+    requestedMonsters.forEach(monster => {
+      if (document.querySelector(`#${monster.index}`)) {
+        document.querySelector(`#${monster.index}`).classList.remove("hidden")
+      } else {
+        console.log(`card not found for ${monster.index}`)
+      }
+    })
+  }
+
+  // GET all the monsters from the api
+  let allMonsters = []
   fetch("https://www.dnd5eapi.co/api/monsters")
     .then(resp => resp.json())
     .then(monsters => {
-      const monster = monsters.results[0]
-      const monsterObj = new Monster(monster.index, monster.url)
-      monsterObj.generateAndAppendCard()
+      allMonsters = monsters.results
+      console.log(allMonsters)
+      const sample = [allMonsters[0], allMonsters[20], allMonsters[50], allMonsters[88], allMonsters[100], allMonsters[138], allMonsters[190]]
+      sample.forEach(monster => {
+        const monsterObj = new Monster(monster.index, monster.url)
+        monsterObj.generateAndAppendCard()
+      })
     })
   // GET the info for each monster
   // create a monster-card for each monster
   // fill in info into the correct elements
   // attach the elements to the card
   // attach the card to the monster container
+
+  document.querySelector("#alphabetical-filter").addEventListener("change", (event) => {
+    clearCurrentCards()
+    const requestedMonsters = allMonsters.filter(monster => monster.index.charAt(0) === event.target.value)
+    displayRequestedMonsters(requestedMonsters)
+  })
+
+  document.querySelector("#search-form").addEventListener("submit", event => {
+    event.preventDefault()
+    clearCurrentCards()
+    const searchInput = document.querySelector("#search-input")
+    // force search term into monster index format for filtering
+    const searchTerm = searchInput.value.toLowerCase().trim().replace(" ", "-")
+    const requestedMonsters = allMonsters.filter(monster => monster.index.includes(searchTerm))
+    if (requestedMonsters.length > 0) {
+      displayRequestedMonsters(requestedMonsters)
+    } else {
+      alert("No results found")
+    }
+    searchInput.value = ""
+  })
 })
