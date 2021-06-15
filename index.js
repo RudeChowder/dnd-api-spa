@@ -7,6 +7,7 @@ class Monster {
   constructor (index, url) {
     this.index = index
     this.url = url
+    this.favorite = false
   }
 
   // possible to DRY this up?
@@ -38,19 +39,19 @@ class Monster {
   }
 
   handleFavorite () {
-    if (favoriteMonsters.includes(this)) {
+    this.favorite = !this.favorite
+    this.checkFavorite()
+  }
+
+  checkFavorite () {
+    if (this.favorite === false) {
       this.favoriteButton.innerHTML = `Favorite <span class="empty">${emptyStar}</span>`
-      const location = favoriteMonsters.indexOf(this)
-      favoriteMonsters.splice(location, 1)
-      console.log(favoriteMonsters)
       this.favoritesListItem.remove()
     } else {
-      favoriteMonsters.push(this)
       this.favoriteButton.innerHTML = `Favorite <span class="full">${fullStar}</span>`
       this.favoritesListItem = document.createElement("li")
       this.favoritesListItem.innerText = this.name
       document.querySelector("#favorites-list").append(this.favoritesListItem)
-      console.log(favoriteMonsters)
     }
   }
 
@@ -106,12 +107,15 @@ class Monster {
   }
 }
 
-const favoriteMonsters = []
 document.addEventListener("DOMContentLoaded", () => {
   const clearCurrentCards = () => {
     allMonsters.forEach(monster => {
       monster.card.classList.add("hidden")
     })
+  }
+
+  const currentFavoriteMonsters = () => {
+    return allMonsters.filter(monster => monster.favorite === true)
   }
 
   const displayRequestedMonsters = (requestedMonsters) => {
@@ -170,5 +174,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   })
 
-  document.querySelector("#show-favorites-button").addEventListener("click", () => displayRequestedMonsters(favoriteMonsters))
+  document.querySelector("#show-favorites-button").addEventListener("click", () => {
+    displayRequestedMonsters(currentFavoriteMonsters())
+  })
+
+  document.querySelector("#clear-favorites").addEventListener("click", () => {
+    const confirmed = confirm("Are you sure you want to clear favorites list?")
+    if (confirmed) {
+      currentFavoriteMonsters().forEach(monster => {
+        monster.favorite = false
+        monster.checkFavorite()
+      })
+      document.querySelector("#favorites-list").innerHTML = ""
+    }
+  })
 })
