@@ -22,14 +22,14 @@
     <div id="search-bar">
       <div class="search">
         <form id="search-form">
-          <label for="search-input">Keyword search: </label>
+          <label for="search-input"><strong>Keyword search: </strong></label>
           <input type="text" name="search-input" id="search-input" value="" placeholder="Monster name">
         </form>
       </div>
       <div class="search" id="filters">
         <label for="alphabetical-filter">Filter by: </label>
         <select name="alphabetical-filter" id="alphabetical-filter">
-          <option value="all" selected>letter</option>
+          <option value="all" selected>all</option>
           <option value="a">A</option>
           <option value="b">B</option>
           <option value="c">C</option>
@@ -58,13 +58,14 @@
           <option value="z">Z</option>
         </select>
       </div>
-      <div>
+      <div class="search">
         <button type="button" id="show-favorites-button">Show favorites</button>
       </div>
     </div>
     
     <div id="monster-list">
-      <!-- <div id="monster-index" class="monster-card">
+      <!-- sample monster card
+      <div id="monster-index" class="monster-card">
         <h2>Monster Name</h2>
         <p id="index-size"><strong>Size: </strong>Medium</p>
         <p id="index-type"><strong>Type: </strong>Humanoid</p>

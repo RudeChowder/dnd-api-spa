@@ -1,6 +1,8 @@
 const emptyStar = "☆"
 const fullStar = "★"
 
+const capitalizeFirstLetter = (word) => word.charAt(0).toUpperCase() + word.slice(1)
+
 class Monster {
   constructor (index, url) {
     this.index = index
@@ -14,19 +16,24 @@ class Monster {
     this.nameTag = document.createElement("h2")
     this.nameTag.classList.add("name")
     this.sizeTag = document.createElement("p")
-    this.nameTag.classList.add("size")
+    this.sizeTag.classList.add("size")
     this.typeTag = document.createElement("p")
-    this.nameTag.classList.add("type")
+    this.typeTag.classList.add("type")
     this.subtypeTag = document.createElement("p")
-    this.nameTag.classList.add("subtype")
+    this.subtypeTag.classList.add("subtype")
+    this.alignmentTag = document.createElement("p")
+    this.alignmentTag.classList.add("alignment")
     this.challengeRatingTag = document.createElement("p")
-    this.nameTag.classList.add("challenge-rating")
+    this.challengeRatingTag.classList.add("challenge-rating")
   }
 
   createFavoriteButton () {
+    this.favoriteButtonDiv = document.createElement("div")
+    this.favoriteButtonDiv.className = "favorite-button-container"
     this.favoriteButton = document.createElement("button")
     this.favoriteButton.type = "button"
     this.favoriteButton.innerHTML = `Favorite <span class="empty">${emptyStar}</span>`
+    this.favoriteButtonDiv.append(this.favoriteButton)
     this.favoriteButton.addEventListener("click", () => this.handleFavorite())
   }
 
@@ -55,6 +62,7 @@ class Monster {
         this.size = attributes.size
         this.type = attributes.type
         this.subtype = attributes.subtype
+        this.alignment = attributes.alignment
         this.challengeRating = attributes.challenge_rating
         this.populateTags() // Should this go here? Avoiding asynch issues
       })
@@ -65,8 +73,13 @@ class Monster {
     this.nameTag.innerHTML = `${this.name}`
     // this.setTagText([this.sizeTag, this.typeTag, this.subtypeTag, this.challengeRatingTag])
     this.sizeTag.innerHTML = `<strong>Size: </strong>${this.size}`
-    this.typeTag.innerHTML = `<strong>Type: </strong>${this.type}`
-    this.subtypeTag.innerHTML = `<strong>Subtype: </strong>${this.subtype}`
+    this.typeTag.innerHTML = `<strong>Type: </strong>${capitalizeFirstLetter(this.type)}`
+    if (this.subtype) {
+      this.subtypeTag.innerHTML = `<strong>Subtype: </strong>${capitalizeFirstLetter(this.subtype)}`
+    } else {
+      this.subtypeTag.innerHTML = "<strong>Subtype: </strong>None"
+    }
+    this.alignmentTag.innerHTML = `<strong>Alignment: </strong>${capitalizeFirstLetter(this.alignment)}`
     this.challengeRatingTag.innerHTML = `<strong>Challenge Rating: </strong>${this.challengeRating}`
   }
 
@@ -75,8 +88,9 @@ class Monster {
     this.card.append(this.sizeTag)
     this.card.append(this.typeTag)
     this.card.append(this.subtypeTag)
+    this.card.append(this.alignmentTag)
     this.card.append(this.challengeRatingTag)
-    this.card.append(this.favoriteButton)
+    this.card.append(this.favoriteButtonDiv)
   }
 
   addCardToPage () {
@@ -111,7 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
     })
   }
 
-  let allMonsters = []
+  const allMonsters = []
   // GET all the monsters from the api
   fetch("https://www.dnd5eapi.co/api/monsters")
     .then(resp => resp.json())
@@ -124,6 +138,13 @@ document.addEventListener("DOMContentLoaded", () => {
         monsterObj.generateAndAppendCard()
         allMonsters.push(monsterObj)
       })
+
+
+      // monsters.results.forEach(monster => {
+      //   const monsterObj = new Monster(monster.index, monster.url)
+      //   monsterObj.generateAndAppendCard()
+      //   allMonsters.push(monsterObj)
+      // })
     })
 
   document.querySelector("#alphabetical-filter").addEventListener("change", (event) => {
@@ -143,13 +164,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const requestedMonsters = allMonsters.filter(monster => monster.index.includes(searchTerm))
     if (requestedMonsters.length > 0) {
       displayRequestedMonsters(requestedMonsters)
+      searchInput.value = ""
     } else {
       alert("No results found")
     }
-    searchInput.value = ""
   })
 
-  document.querySelector("#show-favorites-button").addEventListener("click", () => {
-    displayRequestedMonsters(favoriteMonsters)
-  })
+  document.querySelector("#show-favorites-button").addEventListener("click", () => displayRequestedMonsters(favoriteMonsters))
 })
