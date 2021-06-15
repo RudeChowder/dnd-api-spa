@@ -143,7 +143,6 @@ document.addEventListener("DOMContentLoaded", () => {
         allMonsters.push(monsterObj)
       })
 
-
       // monsters.results.forEach(monster => {
       //   const monsterObj = new Monster(monster.index, monster.url)
       //   monsterObj.generateAndAppendCard()
@@ -151,7 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // })
     })
 
-  document.querySelector("#alphabetical-filter").addEventListener("change", (event) => {
+  document.querySelector("#alphabetical-filter").addEventListener("mouseup", (event) => {
     if (event.target.value === "all") {
       displayRequestedMonsters(allMonsters)
     } else {
