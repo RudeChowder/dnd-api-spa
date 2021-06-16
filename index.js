@@ -33,6 +33,7 @@ class Monster {
     this.favoriteButtonDiv.className = "favorite-button-container"
     this.favoriteButton = document.createElement("button")
     this.favoriteButton.type = "button"
+    this.favoriteButton.className = "favorite-button"
     this.favoriteButton.innerHTML = `Favorite <span class="empty">${emptyStar}</span>`
     this.favoriteButtonDiv.append(this.favoriteButton)
     this.favoriteButton.addEventListener("click", () => this.handleFavorite())
@@ -46,9 +47,11 @@ class Monster {
   checkFavorite () {
     if (this.favorite === false) {
       this.favoriteButton.innerHTML = `Favorite <span class="empty">${emptyStar}</span>`
+      this.favoriteButton.classList.remove("favorited")
       this.favoritesListItem.remove()
     } else {
       this.favoriteButton.innerHTML = `Favorite <span class="full">${fullStar}</span>`
+      this.favoriteButton.classList.add("favorited")
       this.favoritesListItem = document.createElement("li")
       this.favoritesListItem.innerText = this.name
       document.querySelector("#favorites-list").append(this.favoritesListItem)
@@ -188,3 +191,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   })
 })
+
+// start with 4 players
+// can be incremented and decremented. Bottom out at 1
+// user can add or remove li's
+// user can add monsters to the encounter
+// add a counter next to each monster default and bottom out at 1
+// can be incremented
+// can remove monster
+// when calculate is clicked
+// - calculate xp budget per character and add them all together
+// - save the xp thresholds for those characters
+// - calculate xp of all monsters
+// - calculate number of monsters and apply modifier to xp total
+// - determine which threshold the enounter lands in
