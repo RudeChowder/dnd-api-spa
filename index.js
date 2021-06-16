@@ -58,6 +58,64 @@ class Monster {
     }
   }
 
+  createEncounterButton () {
+    this.encounterButtonDiv = document.createElement("div")
+    this.encounterButtonDiv.className = "encounter-button-container"
+    this.encounterButton = document.createElement("button")
+    this.encounterButton.type = "button"
+    this.encounterButton.className = "encounter-button"
+    this.encounterButton.innerHTML = "Add to encounter"
+    this.encounterButtonDiv.append(this.encounterButton)
+    this.encounterButton.addEventListener("click", () => this.addToEncounter(encounter))
+  }
+
+  addToEncounter (encounter) {
+    if (encounter.findMonster(this)) {
+      this.encounterInput.value++
+    } else {
+      encounter.addMonster(this)
+      this.createEncounterTags()
+      this.buildEncounterElement()
+      this.addEncounterElementToPage()
+    }
+  }
+
+  createEncounterTags () {
+    this.encounterLi = document.createElement("li")
+    this.encounterLi.className = "encounter-monster"
+    this.encounterName = document.createElement("label")
+    this.encounterName.innerText = `${this.name}: `
+    this.encounterInput = document.createElement("input")
+    this.encounterInput.type = "number"
+    this.encounterInput.value = "1"
+    this.encounterInput.min = "1"
+    this.encounterInput.required = true
+    this.encounterRemoveButton = document.createElement("button")
+    this.encounterRemoveButton.type = "button"
+    this.encounterRemoveButton.className = "remove-monster"
+    this.encounterRemoveButton.innerHTML = "X"
+    this.encounterRemoveButton.addEventListener("click", () => this.removeEncounterElement())
+  }
+
+  buildEncounterElement () {
+    this.encounterLi.append(this.encounterName)
+    this.encounterLi.append(this.encounterInput)
+    this.encounterLi.append(this.encounterRemoveButton)
+  }
+
+  addEncounterElementToPage () {
+    document.querySelector("#current-monsters").append(this.encounterLi)
+  }
+
+  removeEncounterElement () {
+    this.encounterLi.remove()
+    encounter.removeMonster(this)
+  }
+
+  encounterQuantity () {
+    return parseInt(this.encounterInput.value)
+  }
+
   fetchAttributesAndPopulateTags () {
     fetch(`https://www.dnd5eapi.co${this.url}`)
       .then(resp => resp.json())
@@ -96,6 +154,7 @@ class Monster {
     this.card.append(this.alignmentTag)
     this.card.append(this.challengeRatingTag)
     this.card.append(this.favoriteButtonDiv)
+    this.card.append(this.encounterButton)
   }
 
   addCardToPage () {
@@ -106,14 +165,53 @@ class Monster {
     this.createTags()
     this.fetchAttributesAndPopulateTags()
     this.createFavoriteButton()
+    this.createEncounterButton()
     this.buildCard()
     this.addCardToPage()
   }
 }
 
 class Player {
-  constructor (level) {
+  constructor (level = 1) {
     this.level = level
+    this.generateAndAppendLi()
+  }
+
+  createLevelInputTags () {
+    this.li = document.createElement("li")
+    this.li.className = "player"
+    this.label = document.createElement("label")
+    this.label.innerText = "Player level: "
+    this.input = document.createElement("input")
+    this.input.type = "number"
+    this.input.min = "1"
+    this.input.max = "20"
+    this.input.value = this.level
+    this.input.required = true
+  }
+
+  buildLevelInput () {
+    this.li.append(this.label)
+    this.li.append(this.input)
+  }
+
+  addLevelInputToPage () {
+    document.querySelector("#player-levels").append(this.li)
+  }
+
+  generateAndAppendLi () {
+    this.createLevelInputTags()
+    this.buildLevelInput()
+    this.addLevelInputToPage()
+  }
+
+  updateLevel () {
+    this.level = this.input.value
+    return this.level
+  }
+
+  removeLi () {
+    this.li.remove()
   }
 }
 
@@ -152,8 +250,81 @@ class Encounter {
       15: 4
     }
   }
+
+  addPlayer (player) {
+    this.players.push(player)
+  }
+
+  addMonster (monster) {
+    this.monsters.push(monster)
+  }
+
+  removeLastPlayer () {
+    this.players.pop().removeLi()
+  }
+
+  findMonster (monster) {
+    return this.monsters.find(m => m === monster)
+  }
+
+  removeMonster (monster) {
+    const position = this.monsters.indexOf(monster)
+    this.monsters.splice(position, 1)
+  }
+
+  calculateXpThresholds () {
+    const playerLevels = this.players.map(p => p.updateLevel())
+    const thresholdsPerPlayer = playerLevels.map(playerLevel => this.xpThresholdsPerLevel[playerLevel])
+    this.currentXpThresholds = { easy: 0, medium: 0, hard: 0, deadly: 0 }
+    thresholdsPerPlayer.forEach(player => {
+      this.currentXpThresholds.easy += player.easy
+      this.currentXpThresholds.medium += player.medium
+      this.currentXpThresholds.hard += player.hard
+      this.currentXpThresholds.deadly += player.deadly
+    })
+  }
+
+  calculateMonsterXp () {
+    this.monsterCount = 0
+    this.adjustedMonsterXp = 0
+    this.monsters.forEach(monster => {
+      this.monsterCount += monster.encounterQuantity()
+      this.adjustedMonsterXp += monster.encounterQuantity() * monster.xp
+    })
+    if (this.monsterCount === 2) {
+      this.adjustedMonsterXp *= 1.5
+    } else if (this.monsterCount >= 3 && this.monsterCount < 7) {
+      this.adjustedMonsterXp *= 2
+    } else if (this.monsterCount >= 7 && this.monsterCount < 11) {
+      this.adjustedMonsterXp *= 2.5
+    } else if (this.monsterCount >= 11 && this.monsterCount < 15) {
+      this.adjustedMonsterXp *= 3
+    } else if (this.monsterCount > 15) {
+      this.adjustedMonsterXp *= 4
+    }
+  }
+
+  calculateDifficulty () {
+    this.calculateXpThresholds()
+    this.calculateMonsterXp()
+    console.log("checking difficulty")
+    console.log(`this.adjustedMonsterXp = ${this.adjustedMonsterXp}`)
+    console.log(`this.currentXpThresholds = ${this.currentXpThresholds}`)
+    if (this.adjustedMonsterXp < this.currentXpThresholds.easy) {
+      return "Trivial"
+    } else if (this.adjustedMonsterXp < this.currentXpThresholds.medium) {
+      return "Easy"
+    } else if (this.adjustedMonsterXp < this.currentXpThresholds.hard) {
+      return "Medium"
+    } else if (this.adjustedMonsterXp < this.currentXpThresholds.deadly) {
+      return "Hard"
+    } else if (this.adjustedMonsterXp > this.currentXpThresholds.deadly) {
+      return "Deadly"
+    }
+  }
 }
 
+const encounter = new Encounter()
 document.addEventListener("DOMContentLoaded", () => {
   const clearCurrentCards = () => {
     allMonsters.forEach(monster => {
@@ -176,6 +347,7 @@ document.addEventListener("DOMContentLoaded", () => {
     })
   }
 
+  encounter.addPlayer(new Player())
   const allMonsters = []
   // GET all the monsters from the api
   fetch("https://www.dnd5eapi.co/api/monsters")
@@ -234,18 +406,24 @@ document.addEventListener("DOMContentLoaded", () => {
       document.querySelector("#favorites-list").innerHTML = ""
     }
   })
-})
 
-// start with 1 player
-// can be incremented and decremented. Bottom out at 1
-// user can add or remove li's
-// user can add monsters to the encounter
-// add a counter next to each monster default and bottom out at 1
-// can be incremented
-// can remove monster
-// when calculate is clicked
-// - calculate xp budget per character and add them all together
-// - save the xp thresholds for those characters
-// - calculate xp of all monsters
-// - calculate number of monsters and apply modifier to xp total
-// - determine which threshold the enounter lands in
+  document.querySelector("#players-plus").addEventListener("click", () => {
+    encounter.addPlayer(new Player())
+    document.querySelector("#player-count-selector p").innerText++
+  })
+
+  document.querySelector("#players-minus").addEventListener("click", () => {
+    const playerCount = document.querySelector("#player-count-selector p")
+    if (playerCount.innerText > 1) {
+      encounter.removeLastPlayer()
+      playerCount.innerText--
+    }
+  })
+
+  document.querySelector("#encounter-builder").addEventListener("submit", (event) => {
+    event.preventDefault()
+    const difficulty = encounter.calculateDifficulty()
+    console.log(difficulty)
+    document.querySelector("#difficulty").innerText = difficulty
+  })
+})

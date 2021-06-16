@@ -118,6 +118,7 @@ body {
   width: 55px;
 }
 
+
 #monster-section h4 {
   margin-top: 15px;
   margin-bottom: 10px;
@@ -125,18 +126,29 @@ body {
 
 #current-monsters {
   padding: 0;
+  margin-left: 15px;
 }
 
 .encounter-monster {
   display: flex;
 }
 
+.encounter-monster label{
+  padding-top: 10px;
+}
+
+.encounter-monster input {
+  margin: 8px;
+  height: 16px;
+  width: 55px;
+}
+
 .remove-monster{
   height: 20px;
   width: 20px;
   color: #cf0000;
-  margin-left: 30px;
-  margin-top: 15px;
+  margin-left: 20px;
+  margin-top: 9px;
 }
 
 #difficulty-info {

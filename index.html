@@ -73,25 +73,27 @@
             <div class="counter">
               <p>1</p>
               <span>
-                <button type="button" class="plus-minus-button">+</button>
-                <button type="button" class="plus-minus-button">-</button>
+                <button type="button" id="players-plus" class="plus-minus-button">+</button>
+                <button type="button" id="players-minus" class="plus-minus-button">-</button>
               </span>
             </div>
           </div>
           <div id="player-level-inputs">
             <ul id="player-levels">
-              <li id="player-1" class="player">
-                <label for="player-1-level">Player 1 level:</label>
-                <input name="player-1-level" type="number" required>
-              </li>
+              <!-- 
+                <li class="player">
+                  <label>Player level:</label>
+                  <input type="number" required min="1" max="20">
+                </li>
+              -->
             </ul>
           </div>
         </div>
         <div id="monster-section">
           <h4>Monsters for this encounter:</h4>
           <ul id="current-monsters">
-            
-            <li id="monster-1" class="encounter-monster">
+            <!--
+            <li class="encounter-monster">
               <p>monsterName:</p>
               <div class="counter">
                 <p>1</p>
@@ -102,11 +104,11 @@
               </div>
               <button type="button" class="remove-monster"><strong>X</strong></button>
             </li>
-            
+            -->
           </ul>
         </div>
         <div id="difficulty-info">
-          <button type="button">Calculate!</button>
+          <button type="submit">Calculate!</button>
           <p><strong>Encounter difficulty: </strong><span id=difficulty></span></p>
         </div>
       </form>
