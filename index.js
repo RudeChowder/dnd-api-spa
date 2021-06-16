@@ -10,7 +10,7 @@ class Monster {
     this.favorite = false
   }
 
-  // possible to DRY this up?
+  // Card generation methods
   createTags () {
     this.card = document.createElement("div")
     this.card.classList.add("monster-card")
@@ -39,25 +39,6 @@ class Monster {
     this.favoriteButton.addEventListener("click", () => this.handleFavorite())
   }
 
-  handleFavorite () {
-    this.favorite = !this.favorite
-    this.checkFavorite()
-  }
-
-  checkFavorite () {
-    if (this.favorite === false) {
-      this.favoriteButton.innerHTML = `Favorite <span class="empty">${emptyStar}</span>`
-      this.favoriteButton.classList.remove("favorited")
-      this.favoritesListItem.remove()
-    } else {
-      this.favoriteButton.innerHTML = `Favorite <span class="full">${fullStar}</span>`
-      this.favoriteButton.classList.add("favorited")
-      this.favoritesListItem = document.createElement("li")
-      this.favoritesListItem.innerText = this.name
-      document.querySelector("#favorites-list").append(this.favoritesListItem)
-    }
-  }
-
   createEncounterButton () {
     this.encounterButtonDiv = document.createElement("div")
     this.encounterButtonDiv.className = "encounter-button-container"
@@ -67,53 +48,6 @@ class Monster {
     this.encounterButton.innerHTML = "Add to encounter"
     this.encounterButtonDiv.append(this.encounterButton)
     this.encounterButton.addEventListener("click", () => this.addToEncounter(encounter))
-  }
-
-  addToEncounter (encounter) {
-    if (encounter.findMonster(this)) {
-      this.encounterInput.value++
-    } else {
-      encounter.addMonster(this)
-      this.createEncounterTags()
-      this.buildEncounterElement()
-      this.addEncounterElementToPage()
-    }
-  }
-
-  createEncounterTags () {
-    this.encounterLi = document.createElement("li")
-    this.encounterLi.className = "encounter-monster"
-    this.encounterName = document.createElement("label")
-    this.encounterName.innerText = `${this.name}: `
-    this.encounterInput = document.createElement("input")
-    this.encounterInput.type = "number"
-    this.encounterInput.value = "1"
-    this.encounterInput.min = "1"
-    this.encounterInput.required = true
-    this.encounterRemoveButton = document.createElement("button")
-    this.encounterRemoveButton.type = "button"
-    this.encounterRemoveButton.className = "remove-monster"
-    this.encounterRemoveButton.innerHTML = "X"
-    this.encounterRemoveButton.addEventListener("click", () => this.removeEncounterElement())
-  }
-
-  buildEncounterElement () {
-    this.encounterLi.append(this.encounterName)
-    this.encounterLi.append(this.encounterInput)
-    this.encounterLi.append(this.encounterRemoveButton)
-  }
-
-  addEncounterElementToPage () {
-    document.querySelector("#current-monsters").append(this.encounterLi)
-  }
-
-  removeEncounterElement () {
-    this.encounterLi.remove()
-    encounter.removeMonster(this)
-  }
-
-  encounterQuantity () {
-    return parseInt(this.encounterInput.value)
   }
 
   fetchAttributesAndPopulateTags () {
@@ -154,7 +88,7 @@ class Monster {
     this.card.append(this.alignmentTag)
     this.card.append(this.challengeRatingTag)
     this.card.append(this.favoriteButtonDiv)
-    this.card.append(this.encounterButton)
+    this.card.append(this.encounterButtonDiv)
   }
 
   addCardToPage () {
@@ -168,6 +102,74 @@ class Monster {
     this.createEncounterButton()
     this.buildCard()
     this.addCardToPage()
+  }
+
+  // Handling button events
+  handleFavorite () {
+    this.favorite = !this.favorite
+    this.checkFavorite()
+  }
+
+  checkFavorite () {
+    if (this.favorite === false) {
+      this.favoriteButton.innerHTML = `Favorite <span class="empty">${emptyStar}</span>`
+      this.favoriteButton.classList.remove("favorited")
+      this.favoritesListItem.remove()
+    } else {
+      this.favoriteButton.innerHTML = `Favorite <span class="full">${fullStar}</span>`
+      this.favoriteButton.classList.add("favorited")
+      this.favoritesListItem = document.createElement("li")
+      this.favoritesListItem.innerText = this.name
+      document.querySelector("#favorites-list").append(this.favoritesListItem)
+    }
+  }
+
+  addToEncounter (encounter) {
+    if (encounter.findMonster(this)) {
+      this.encounterInput.value++
+    } else {
+      encounter.addMonster(this)
+      this.createEncounterTags()
+      this.buildEncounterElement()
+      this.addEncounterElementToPage()
+    }
+  }
+
+  // Encounter element manipulation methods
+  createEncounterTags () {
+    this.encounterLi = document.createElement("li")
+    this.encounterLi.className = "encounter-monster"
+    this.encounterName = document.createElement("label")
+    this.encounterName.innerText = `${this.name}: `
+    this.encounterInput = document.createElement("input")
+    this.encounterInput.type = "number"
+    this.encounterInput.value = "1"
+    this.encounterInput.min = "1"
+    this.encounterInput.required = true
+    this.encounterRemoveButton = document.createElement("button")
+    this.encounterRemoveButton.type = "button"
+    this.encounterRemoveButton.className = "remove-monster"
+    this.encounterRemoveButton.innerHTML = "X"
+    this.encounterRemoveButton.addEventListener("click", () => this.removeEncounterElement())
+  }
+
+  buildEncounterElement () {
+    this.encounterLi.append(this.encounterName)
+    this.encounterLi.append(this.encounterInput)
+    this.encounterLi.append(this.encounterRemoveButton)
+  }
+
+  addEncounterElementToPage () {
+    document.querySelector("#current-monsters").append(this.encounterLi)
+  }
+
+  removeEncounterElement () {
+    this.encounterLi.remove()
+    encounter.removeMonster(this)
+  }
+
+  encounterQuantity () {
+    return parseInt(this.encounterInput.value)
   }
 }
 
@@ -241,14 +243,6 @@ class Encounter {
       19: { easy: 2400, medium: 4900, hard: 7300, deadly: 10900 },
       20: { easy: 2800, medium: 5700, hard: 8500, deadly: 12700 }
     }
-    this.monsterQuantityMultiplierBreakpoints = {
-      1: 1,
-      2: 1.5,
-      3: 2,
-      7: 2.5,
-      11: 3,
-      15: 4
-    }
   }
 
   addPlayer (player) {
@@ -284,6 +278,7 @@ class Encounter {
     })
   }
 
+  // determine the number of monsters and apply the related xp modifier
   calculateMonsterXp () {
     this.monsterCount = 0
     this.adjustedMonsterXp = 0
@@ -318,7 +313,7 @@ class Encounter {
       return "Medium"
     } else if (this.adjustedMonsterXp < this.currentXpThresholds.deadly) {
       return "Hard"
-    } else if (this.adjustedMonsterXp > this.currentXpThresholds.deadly) {
+    } else if (this.adjustedMonsterXp >= this.currentXpThresholds.deadly) {
       return "Deadly"
     }
   }
@@ -326,7 +321,7 @@ class Encounter {
 
 const encounter = new Encounter()
 document.addEventListener("DOMContentLoaded", () => {
-  const clearCurrentCards = () => {
+  const hideCurrentCards = () => {
     allMonsters.forEach(monster => {
       monster.card.classList.add("hidden")
     })
@@ -337,7 +332,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   const displayRequestedMonsters = (requestedMonsters) => {
-    clearCurrentCards()
+    hideCurrentCards()
     requestedMonsters.forEach(monster => {
       if (document.querySelector(`#${monster.index}`)) {
         document.querySelector(`#${monster.index}`).classList.remove("hidden")
@@ -397,7 +392,7 @@ document.addEventListener("DOMContentLoaded", () => {
   })
 
   document.querySelector("#clear-favorites").addEventListener("click", () => {
-    const confirmed = confirm("Are you sure you want to clear favorites list?")
+    const confirmed = confirm("Are you sure you want to clear your favorites list?")
     if (confirmed) {
       currentFavoriteMonsters().forEach(monster => {
         monster.favorite = false
@@ -420,10 +415,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   })
 
-  document.querySelector("#encounter-builder").addEventListener("submit", (event) => {
+  document.querySelector(".encounter-builder").addEventListener("submit", (event) => {
     event.preventDefault()
     const difficulty = encounter.calculateDifficulty()
     console.log(difficulty)
     document.querySelector("#difficulty").innerText = difficulty
+  })
+
+  document.querySelector(".encounter-builder").classList.toggle("hidden")
+  document.querySelector("#encounter-form-toggle").addEventListener("click", (event) => {
+    const encounterForm = document.querySelector(".encounter-builder")
+    encounterForm.classList.toggle("hidden")
+    if (event.target.innerText === "Show Encounter Builder") {
+      event.target.innerText = "Hide Encounter Builder"
+    } else {
+      event.target.innerText = "Show Encounter Builder"
+    }
   })
 })
