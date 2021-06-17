@@ -1,13 +1,15 @@
 const emptyStar = "☆"
 const fullStar = "★"
 
-const capitalizeFirstLetter = (word) => word.charAt(0).toUpperCase() + word.slice(1)
-
 class Monster {
   constructor (index, url) {
     this.index = index
     this.url = url
     this.favorite = false
+  }
+
+  capitalizeFirstLetter (word) {
+    return word.charAt(0).toUpperCase() + word.slice(1)
   }
 
   // Card generation methods
@@ -61,22 +63,21 @@ class Monster {
         this.alignment = attributes.alignment
         this.challengeRating = attributes.challenge_rating
         this.xp = attributes.xp
-        this.populateTags() // Should this go here? Avoiding asynch issues
+        this.populateTags()
       })
   }
 
   populateTags () {
     this.card.id = this.index
     this.nameTag.innerHTML = `${this.name}`
-    // this.setTagText([this.sizeTag, this.typeTag, this.subtypeTag, this.challengeRatingTag])
     this.sizeTag.innerHTML = `<strong>Size: </strong>${this.size}`
-    this.typeTag.innerHTML = `<strong>Type: </strong>${capitalizeFirstLetter(this.type)}`
+    this.typeTag.innerHTML = `<strong>Type: </strong>${this.capitalizeFirstLetter(this.type)}`
     if (this.subtype) {
-      this.subtypeTag.innerHTML = `<strong>Subtype: </strong>${capitalizeFirstLetter(this.subtype)}`
+      this.subtypeTag.innerHTML = `<strong>Subtype: </strong>${this.capitalizeFirstLetter(this.subtype)}`
     } else {
       this.subtypeTag.innerHTML = "<strong>Subtype: </strong>None"
     }
-    this.alignmentTag.innerHTML = `<strong>Alignment: </strong>${capitalizeFirstLetter(this.alignment)}`
+    this.alignmentTag.innerHTML = `<strong>Alignment: </strong>${this.capitalizeFirstLetter(this.alignment)}`
     this.challengeRatingTag.innerHTML = `<strong>Challenge Rating: </strong>${this.challengeRating}`
   }
 
@@ -102,37 +103,6 @@ class Monster {
     this.createEncounterButton()
     this.buildCard()
     this.addCardToPage()
-  }
-
-  // Handling button events
-  handleFavorite () {
-    this.favorite = !this.favorite
-    this.checkFavorite()
-  }
-
-  checkFavorite () {
-    if (this.favorite === false) {
-      this.favoriteButton.innerHTML = `Favorite <span class="empty">${emptyStar}</span>`
-      this.favoriteButton.classList.remove("favorited")
-      this.favoritesListItem.remove()
-    } else {
-      this.favoriteButton.innerHTML = `Favorite <span class="full">${fullStar}</span>`
-      this.favoriteButton.classList.add("favorited")
-      this.favoritesListItem = document.createElement("li")
-      this.favoritesListItem.innerText = this.name
-      document.querySelector("#favorites-list").append(this.favoritesListItem)
-    }
-  }
-
-  addToEncounter (encounter) {
-    if (encounter.findMonster(this)) {
-      this.encounterInput.value++
-    } else {
-      encounter.addMonster(this)
-      this.createEncounterTags()
-      this.buildEncounterElement()
-      this.addEncounterElementToPage()
-    }
   }
 
   // Encounter element manipulation methods
@@ -170,6 +140,37 @@ class Monster {
 
   encounterQuantity () {
     return parseInt(this.encounterInput.value)
+  }
+
+  // Handling button events
+  handleFavorite () {
+    this.favorite = !this.favorite
+    this.checkFavorite()
+  }
+
+  checkFavorite () {
+    if (this.favorite === false) {
+      this.favoriteButton.innerHTML = `Favorite <span class="empty">${emptyStar}</span>`
+      this.favoriteButton.classList.remove("favorited")
+      this.favoritesListItem.remove()
+    } else {
+      this.favoriteButton.innerHTML = `Favorite <span class="full">${fullStar}</span>`
+      this.favoriteButton.classList.add("favorited")
+      this.favoritesListItem = document.createElement("li")
+      this.favoritesListItem.innerText = this.name
+      document.querySelector("#favorites-list").append(this.favoritesListItem)
+    }
+  }
+
+  addToEncounter (encounter) {
+    if (encounter.findMonster(this)) {
+      this.encounterInput.value++
+    } else {
+      encounter.addMonster(this)
+      this.createEncounterTags()
+      this.buildEncounterElement()
+      this.addEncounterElementToPage()
+    }
   }
 }
 
@@ -302,9 +303,6 @@ class Encounter {
   calculateDifficulty () {
     this.calculateXpThresholds()
     this.calculateMonsterXp()
-    console.log("checking difficulty")
-    console.log(`this.adjustedMonsterXp = ${this.adjustedMonsterXp}`)
-    console.log(`this.currentXpThresholds = ${this.currentXpThresholds}`)
     if (this.adjustedMonsterXp < this.currentXpThresholds.easy) {
       return "Trivial"
     } else if (this.adjustedMonsterXp < this.currentXpThresholds.medium) {
@@ -344,7 +342,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   encounter.addPlayer(new Player())
   const allMonsters = []
-  // GET all the monsters from the api
   fetch("https://www.dnd5eapi.co/api/monsters")
     .then(resp => resp.json())
     .then(monsters => {
@@ -376,7 +373,6 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelector("#search-form").addEventListener("submit", event => {
     event.preventDefault()
     const searchInput = document.querySelector("#search-input")
-    // force search term into monster index format for filtering
     const searchTerm = searchInput.value.toLowerCase().trim().replace(" ", "-")
     const requestedMonsters = allMonsters.filter(monster => monster.index.includes(searchTerm))
     if (requestedMonsters.length > 0) {
@@ -418,7 +414,6 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelector(".encounter-builder").addEventListener("submit", (event) => {
     event.preventDefault()
     const difficulty = encounter.calculateDifficulty()
-    console.log(difficulty)
     document.querySelector("#difficulty").innerText = difficulty
   })
 

@@ -1,8 +1,10 @@
 @import url("https://fonts.googleapis.com/css2?family=Mate+SC&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Lora&display=swap');
 
 body {
   background-image: url("assets/parchment.jpg");
   background-repeat: repeat;
+  font-family: 'Lora', serif;
 }
 
 .favorites {
@@ -59,7 +61,7 @@ body {
 
 .encounter-builder {
   background-color: #DDBEA8;
-  background-image: url("assets/combat2.png");
+  background-image: url("assets/combat.png");
   background-repeat: no-repeat;
   background-size: cover;
   background-blend-mode: soft-light;
@@ -209,9 +211,7 @@ body {
 }
 
 .favorite-button {
-  background-image: url("assets/parchment.jpg");
-  background-color: #43B1AC;
-  background-blend-mode: darken;
+  background-color: #d2bea1;
   border-radius: 8px;
 }
 
@@ -238,8 +238,10 @@ span.full{
   border-radius: 8px;
 }
 
+.encounter-button:hover {
+  background-color: #e3e3e3;
+}
+
 .hidden {
   display: none;
 }
-
-/* color scheme: 160F29, 246A73, 43B1AC, F3DFC1, DDBEA8 */
