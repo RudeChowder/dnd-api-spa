@@ -345,20 +345,11 @@ document.addEventListener("DOMContentLoaded", () => {
   fetch("https://www.dnd5eapi.co/api/monsters")
     .then(resp => resp.json())
     .then(monsters => {
-      const testMonsters = monsters.results
-      console.log(testMonsters)
-      const sample = [testMonsters[0], testMonsters[20], testMonsters[50], testMonsters[88], testMonsters[100], testMonsters[138], testMonsters[190]]
-      sample.forEach(monster => {
+      monsters.results.forEach(monster => {
         const monsterObj = new Monster(monster.index, monster.url)
         monsterObj.generateAndAppendCard()
         allMonsters.push(monsterObj)
       })
-
-      // monsters.results.forEach(monster => {
-      //   const monsterObj = new Monster(monster.index, monster.url)
-      //   monsterObj.generateAndAppendCard()
-      //   allMonsters.push(monsterObj)
-      // })
     })
 
   document.querySelector("#alphabetical-filter").addEventListener("mouseup", (event) => {
